@@ -17,7 +17,8 @@ public class ExpenseController {
 
     @PostMapping("/expense")
     public Expense addExpense(@RequestBody Expense entry) {
-        return addExpense(entry);
+        expenses.add(entry);
+        return entry;
     }
 
     @DeleteMapping("/expense")
