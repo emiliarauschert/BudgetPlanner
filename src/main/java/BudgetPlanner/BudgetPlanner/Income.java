@@ -4,8 +4,8 @@ public class Income {
     private final String name;
     private final double amount;
 
-    public Income(String month, double amount) {
-        this.name = month;
+    public Income(String name, double amount) {
+        this.name = name;
         this.amount = amount;
     }
 

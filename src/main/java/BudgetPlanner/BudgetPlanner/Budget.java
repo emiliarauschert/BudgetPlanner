@@ -13,29 +13,11 @@ import java.util.List;
             this.limit = limit;
             this.expenses = expenses;
             this.income = income;
-
-            addExpenses();
-            addIncome();
         }
 
         public String getMonth() { return month; }
         public double getLimit() { return limit; }
         public List<Expense> getExpenses() { return expenses; }
         public List<Income> getIncome() { return income; }
-
-        public void addExpenses() {
-            Expense expense = new Expense("Miete", 500.00);
-            expenses.add(expense);
-            Expense expense2 = new Expense("Essen", 200.00);
-            expenses.add(expense2);
-            Expense expense3 = new Expense("Tanken", 500.00);
-            expenses.add(expense3);
-        }
-
-        public void addIncome() {
-            Income income = new Income("Gehalt", 2000.00);
-        }
-
-
     }
 

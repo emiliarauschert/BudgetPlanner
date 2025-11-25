@@ -12,7 +12,7 @@ public class ExpenseController {
 
     @GetMapping("/expense")
     public List<Expense> getExpenses() {
-        return getExpenses();
+        return expenses;
     }
 
     @PostMapping("/expense")
@@ -20,7 +20,7 @@ public class ExpenseController {
         return addExpense(entry);
     }
 
-    @DeleteMapping("expense")
+    @DeleteMapping("/expense")
     public String clearExpenses() {
         expenses.clear();
         return "Alle Expenses gelöscht!";
