@@ -1,13 +1,14 @@
 package BudgetPlanner.BudgetPlanner;
 
 import org.springframework.web.bind.annotation.*;
-
 import java.util.ArrayList;
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = {"http://localhost:5173","https://budgetplanner-frontend.onrender.com"})
 @RestController
 public class BudgetController {
+
+
 
     private List<Budget> budgets = new ArrayList<>(List.of(
             new Budget("November", 1500.00,
