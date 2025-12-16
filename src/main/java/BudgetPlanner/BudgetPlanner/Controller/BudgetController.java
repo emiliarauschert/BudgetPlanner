@@ -1,5 +1,8 @@
-package BudgetPlanner.BudgetPlanner;
+package BudgetPlanner.BudgetPlanner.Controller;
 
+import BudgetPlanner.BudgetPlanner.Modell.Budget;
+import BudgetPlanner.BudgetPlanner.Modell.Expense;
+import BudgetPlanner.BudgetPlanner.Modell.Income;
 import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;

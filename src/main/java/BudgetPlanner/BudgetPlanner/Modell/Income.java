@@ -1,4 +1,4 @@
-package BudgetPlanner.BudgetPlanner;
+package BudgetPlanner.BudgetPlanner.Modell;
 
 public class Income {
     private final String name;
@@ -9,7 +9,6 @@ public class Income {
         this.amount = amount;
     }
 
-    public String getMonth() { return name; }
+    public String getName() { return name; }
     public double getAmount() { return amount; }
-
 }

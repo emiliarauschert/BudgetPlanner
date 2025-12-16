@@ -1,4 +1,4 @@
-package BudgetPlanner.BudgetPlanner;
+package BudgetPlanner.BudgetPlanner.Modell;
 
 import java.util.List;
 

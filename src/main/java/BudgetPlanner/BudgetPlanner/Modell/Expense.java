@@ -1,4 +1,4 @@
-package BudgetPlanner.BudgetPlanner;
+package BudgetPlanner.BudgetPlanner.Modell;
 
 public class Expense {
     private String name;
