@@ -1,9 +1,6 @@
 package BudgetPlanner.BudgetPlanner.Modell;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 import java.util.List;
 
@@ -12,9 +9,10 @@ public class Budget {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private long id;
 
     private String month;
+    @Column(name = "budget_limit")
     private double limit;
     //private List<Expense> expenses;
     //private List<Income> income;
@@ -28,13 +26,13 @@ public class Budget {
        // this.income = income;
     }
 
-    public int getId() {return id;}
+    public long getId() {return id;}
     public String getMonth() { return month; }
     public double getLimit() { return limit; }
     //public List<Expense> getExpenses() { return expenses; }
     //public List<Income> getIncome() { return income; }
 
-    public void setId(int id) {this.id = id;}
+    public void setId(long id) {this.id = id;}
     public void setMonth(String month) {this.month = month;}
     public void setLimit(double limit) {this.limit = limit;}
     }

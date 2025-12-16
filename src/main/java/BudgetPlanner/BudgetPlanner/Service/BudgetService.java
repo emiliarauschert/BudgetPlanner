@@ -4,6 +4,8 @@ import BudgetPlanner.BudgetPlanner.Modell.Budget;
 import BudgetPlanner.BudgetPlanner.Repository.BudgetRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class BudgetService {
     private final BudgetRepository budgetRepository;
@@ -16,7 +18,7 @@ public class BudgetService {
         return budgetRepository.save(budget);
     }
 
-    public Budget getAllBudgets() {
-        return (Budget) budgetRepository.findAll();
+    public List<Budget> getAllBudgets() {
+        return budgetRepository.findAll();
     }
 }
