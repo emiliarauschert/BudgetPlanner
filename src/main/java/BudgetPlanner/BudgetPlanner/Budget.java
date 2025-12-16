@@ -8,6 +8,8 @@ import java.util.List;
         private List<Expense> expenses;
         private List<Income> income;
 
+        public Budget() {}
+
         public Budget(String month, double limit, List<Expense> expenses, List<Income> income) {
             this.month = month;
             this.limit = limit;
