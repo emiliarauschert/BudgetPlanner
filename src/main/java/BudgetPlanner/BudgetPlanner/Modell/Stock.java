@@ -24,6 +24,35 @@ public class Stock {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    // Getter & Setter
+    public String getName(){
+        return name;
+    }
+    public void setName(String name){
+        this.name = name;
+    }
+    public double getQuantity(){
+        return quantity;
+    }
+    public void setQuantity(double quantity){
+        this.quantity = quantity;
+    }
+    public double getBuyPrice(){
+        return buyPrice;
+    }
+    public void setBuyPrice(double buyPrice){
+        this.buyPrice = buyPrice;
+    }
+    public LocalDate getBuyDate(){
+        return buyDate;
+    }
+    public void setBuyDate(LocalDate buyDate){
+        this.buyDate = buyDate;
+    }
+    public User getUser(){
+        return user;
+    }
+    public void setUser(User user){
+        this.user = user;
+    }
 }
 
