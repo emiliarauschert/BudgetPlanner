@@ -2,6 +2,8 @@ package BudgetPlanner.BudgetPlanner.Controller;
 
 import BudgetPlanner.BudgetPlanner.Modell.User;
 import BudgetPlanner.BudgetPlanner.Repository.UserRepository;
+import BudgetPlanner.BudgetPlanner.dto.LoginRequest;
+import BudgetPlanner.BudgetPlanner.dto.SignUpRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,9 +23,31 @@ public class UserController {
         this.passwordEncoder = passwordEncoder;
     }
 
-    @PostMapping("/register")
-    public User register(@RequestBody User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepository.save(user);
+    @PostMapping("/login")
+    public String login(@RequestBody LoginRequest request) {
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("User nicht gefunden"));
+
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new RuntimeException("Falsches Passwort");
+        }
+        return "Login erfolgreich";
+
     }
+
+    @PostMapping("/register")
+    public String register(@RequestBody SignUpRequest request) {
+        User user = new User();
+        user.setName(request.getName());
+        user.setEmail(request.getEmail());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+
+        userRepository.save(user);
+
+        return "Registrierung erfolgreich";
+
+    }
+
 }
+
+
