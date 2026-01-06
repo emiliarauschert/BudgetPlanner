@@ -18,6 +18,7 @@ public class IncomeController {
 
     @PostMapping("/income")
     public Income addIncome(@RequestBody Income entry) {
+        income.add(entry);
         return entry;
     }
 
