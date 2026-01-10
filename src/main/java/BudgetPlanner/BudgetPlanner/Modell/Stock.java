@@ -11,6 +11,8 @@ public class Stock {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String symbol;
+
     private String name;
 
     private double quantity;

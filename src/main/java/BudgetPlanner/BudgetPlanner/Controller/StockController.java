@@ -5,6 +5,7 @@ import BudgetPlanner.BudgetPlanner.Modell.User;
 import BudgetPlanner.BudgetPlanner.Repository.UserRepository;
 import BudgetPlanner.BudgetPlanner.Service.FinnhubService;
 import BudgetPlanner.BudgetPlanner.Service.StockService;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,18 +31,20 @@ public class StockController {
     }
 
     @GetMapping
-    public List<Stock> getUserStocks(@AuthenticationPrincipal User user) {
+    public List<Stock> getUserStocks(Authentication authentication) {
+        String email = authentication.getName();
+        User user = userRepository.findByEmail(email).orElseThrow();
         return stockService.getStocksForUser(user);
     }
 
     @PostMapping
-    public Stock addStock(
-            @RequestBody Stock stock,
-            @AuthenticationPrincipal User user
-    ) {
+    public Stock addStock(@RequestBody Stock stock, Authentication authentication) {
+        String email = authentication.getName();
+        User user = userRepository.findByEmail(email).orElseThrow();
         stock.setUser(user);
         return stockService.saveStock(stock);
     }
+
 
     @GetMapping("/quote/{symbol}")
     public String getQuote(@PathVariable String symbol) {
