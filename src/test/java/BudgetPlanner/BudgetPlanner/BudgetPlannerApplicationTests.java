@@ -62,6 +62,11 @@ class BudgetPlannerApplicationTests {
 	}
 
 	@Test
+	void loginTest() throws Exception {
+
+	}
+
+	@Test
 	void getBudgetTest() throws Exception {
 
 		String json = """
@@ -117,6 +122,10 @@ class BudgetPlannerApplicationTests {
 				.andExpect(jsonPath("$.length()").value(0));
 	}
 
+
+	@Test
+	void clearIncomeTest() throws Exception {}
+
 	@Test
 	void getIncomeTest() throws Exception {
 		String json = """
@@ -143,6 +152,23 @@ class BudgetPlannerApplicationTests {
 
 
 	}
+
+
+	@Test
+	void hashPasswordTest() throws Exception {
+
+	}
+
+	@Test
+	void getStockTest() throws Exception {
+
+	}
+
+	@Test
+	void getStockQuote() throws Exception {
+
+	}
+
 
 
 }
