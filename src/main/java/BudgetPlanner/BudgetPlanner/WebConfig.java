@@ -17,9 +17,11 @@ public class WebConfig {
                         .allowedOrigins(
                                 "http://localhost:5173",
                                 "https://budgetplanner-frontend-w50n.onrender.com"
+                                // hier weitere Links einfügen
                         )
-                        .allowedMethods("GET","POST","PUT","DELETE")
-                        .allowCredentials(true);
+                        .allowedMethods("GET","POST","PUT","DELETE","OPTIONS")
+                        .allowedHeaders("*")
+                        .exposedHeaders("*");
             }
         };
     }
