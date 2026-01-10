@@ -56,5 +56,11 @@ public class Stock {
     public void setUser(User user){
         this.user = user;
     }
+    public String getSymbol(){
+        return symbol;
+    }
+    public void setSymbol(String symbol){
+        this.symbol = symbol;
+    }
 }
 
