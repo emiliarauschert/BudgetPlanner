@@ -6,7 +6,6 @@ import BudgetPlanner.BudgetPlanner.Repository.UserRepository;
 import BudgetPlanner.BudgetPlanner.Service.FinnhubService;
 import BudgetPlanner.BudgetPlanner.Service.StockService;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -45,7 +44,6 @@ public class StockController {
         return stockService.saveStock(stock);
     }
 
-
     @GetMapping("/quote/{symbol}")
     public String getQuote(@PathVariable String symbol) {
         return finnhubService.getQuote(symbol);
@@ -56,4 +54,3 @@ public class StockController {
         return finnhubService.getChart(symbol);
     }
 }
-
