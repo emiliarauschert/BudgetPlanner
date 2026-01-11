@@ -1,31 +1,46 @@
 package BudgetPlanner.BudgetPlanner.Controller;
 
 import BudgetPlanner.BudgetPlanner.Modell.Income;
+import BudgetPlanner.BudgetPlanner.Modell.User;
+import BudgetPlanner.BudgetPlanner.Repository.UserRepository;
+import BudgetPlanner.BudgetPlanner.Service.IncomeService;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import java.util.ArrayList;
+
+import java.time.LocalDate;
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:5173")
 @RestController
+@RequestMapping("/api/income")
+@CrossOrigin
 public class IncomeController {
 
-    private List<Income> income = new ArrayList<>();
+    private final IncomeService incomeService;
+    private final UserRepository userRepository;
 
-    @GetMapping("/income")
-    public List<Income> getIncome() {
-        return income;
+    public IncomeController(IncomeService incomeService, UserRepository userRepository) {
+        this.incomeService = incomeService;
+        this.userRepository = userRepository;
     }
 
-    @PostMapping("/income")
-    public Income addIncome(@RequestBody Income entry) {
-        income.add(entry);
-        return entry;
+    private User currentUser(Authentication auth) {
+        return userRepository.findByEmail(auth.getName()).orElseThrow();
     }
 
-    @DeleteMapping("/income")
-    public String clearIncome() {
-        income.clear();
-        return "Alle Incomes gelöscht!";
+    @GetMapping
+    public List<Income> getIncome(Authentication auth) {
+        return incomeService.getForUser(currentUser(auth));
+    }
+
+    @PostMapping
+    public Income addIncome(@RequestBody Income income, Authentication auth) {
+        income.setUser(currentUser(auth));
+        if (income.getDate() == null) income.setDate(LocalDate.now());
+        return incomeService.save(income);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteIncome(@PathVariable Long id) {
+        incomeService.delete(id);
     }
 }
-
