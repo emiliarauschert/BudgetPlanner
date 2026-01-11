@@ -2,38 +2,36 @@ package BudgetPlanner.BudgetPlanner.Modell;
 
 import jakarta.persistence.*;
 
-import java.util.List;
-
 @Entity
+@Table(name = "budgets")
 public class Budget {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
-    private String month;
-    @Column(name = "budget_limit")
-    private double limit;
-    //private List<Expense> expenses;
-    //private List<Income> income;
+    private String month;        // z.B. 2026-01
+    private double limitAmount;
+
+    private String category;     // z.B. FOOD, RENT, FUN
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     public Budget() {}
 
-    public Budget(String month, double limit, List<Expense> expenses, List<Income> income) {
-        this.month = month;
-        this.limit = limit;
-        //this.expenses = expenses;
-       // this.income = income;
-    }
-
-    public long getId() {return id;}
+    // Getter & Setter
+    public Long getId() { return id; }
     public String getMonth() { return month; }
-    public double getLimit() { return limit; }
-    //public List<Expense> getExpenses() { return expenses; }
-    //public List<Income> getIncome() { return income; }
+    public double getLimitAmount() { return limitAmount; }
+    public String getCategory() { return category; }
+    public User getUser() { return user; }
 
-    public void setId(long id) {this.id = id;}
-    public void setMonth(String month) {this.month = month;}
-    public void setLimit(double limit) {this.limit = limit;}
-    }
+    public void setMonth(String month) { this.month = month; }
+    public void setLimitAmount(double limitAmount) { this.limitAmount = limitAmount; }
+    public void setCategory(String category) { this.category = category; }
+    public void setUser(User user) { this.user = user; }
+}
+
 

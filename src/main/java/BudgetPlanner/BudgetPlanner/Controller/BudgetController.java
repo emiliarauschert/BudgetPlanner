@@ -1,37 +1,46 @@
 package BudgetPlanner.BudgetPlanner.Controller;
 
 import BudgetPlanner.BudgetPlanner.Modell.Budget;
+import BudgetPlanner.BudgetPlanner.Modell.User;
+import BudgetPlanner.BudgetPlanner.Repository.UserRepository;
 import BudgetPlanner.BudgetPlanner.Service.BudgetService;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin(origins = {"http://localhost:5173","https://budgetplanner-frontend.onrender.com"})
 @RestController
-@RequestMapping("/budgets")
+@RequestMapping("/api/budgets")
+@CrossOrigin
 public class BudgetController {
 
     private final BudgetService budgetService;
+    private final UserRepository userRepository;
 
-    public BudgetController(BudgetService budgetService) {
+    public BudgetController(BudgetService budgetService, UserRepository userRepository) {
         this.budgetService = budgetService;
+        this.userRepository = userRepository;
     }
 
     @GetMapping
-    public List<Budget> getBudgets() {
-        return budgetService.getAllBudgets();
+    public List<Budget> getBudgets(Authentication auth) {
+        User user = userRepository.findByEmail(auth.getName()).orElseThrow();
+        return budgetService.getForUser(user);
     }
 
     @PostMapping
-    public Budget addBudget(@RequestBody Budget budget) {
-        return budgetService.saveBudget(budget);
-    }
-    @DeleteMapping
-    public String clearBudgets() {
-        return "Alle Budgets gelöscht!";
+    public Budget addBudget(@RequestBody Budget budget, Authentication auth) {
+        User user = userRepository.findByEmail(auth.getName()).orElseThrow();
+        budget.setUser(user);
+        return budgetService.save(budget);
     }
 
+    @DeleteMapping("/{id}")
+    public void deleteBudget(@PathVariable Long id) {
+        budgetService.delete(id);
+    }
 }
+
 
 
 
