@@ -23,5 +23,12 @@ public class StockService {
     public Stock saveStock(Stock stock) {
         return stockRepository.save(stock);
     }
-}
 
+    public void deleteStockForUser(Long id, User user) {
+        stockRepository.deleteByIdAndUser(id, user);
+    }
+
+    public void clearPortfolioForUser(User user) {
+        stockRepository.deleteByUser(user);
+    }
+}

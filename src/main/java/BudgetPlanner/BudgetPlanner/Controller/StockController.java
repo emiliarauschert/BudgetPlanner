@@ -44,6 +44,20 @@ public class StockController {
         return stockService.saveStock(stock);
     }
 
+    @DeleteMapping("/{id}")
+    public void deleteStock(@PathVariable Long id, Authentication authentication) {
+        String email = authentication.getName();
+        User user = userRepository.findByEmail(email).orElseThrow();
+        stockService.deleteStockForUser(id, user);
+    }
+
+    @DeleteMapping
+    public void clearPortfolio(Authentication authentication) {
+        String email = authentication.getName();
+        User user = userRepository.findByEmail(email).orElseThrow();
+        stockService.clearPortfolioForUser(user);
+    }
+
     @GetMapping("/quote/{symbol}")
     public String getQuote(@PathVariable String symbol) {
         return finnhubService.getQuote(symbol);
