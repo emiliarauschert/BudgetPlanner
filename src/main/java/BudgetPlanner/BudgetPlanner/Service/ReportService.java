@@ -34,8 +34,7 @@ public class ReportService {
     }
 
     public ReportResponse buildReport(User user, String month) {
-        // month: "YYYY-MM"
-        YearMonth ym = YearMonth.parse(month);
+        YearMonth ym = YearMonth.parse(month); // erwartet YYYY-MM
         LocalDate from = ym.atDay(1);
         LocalDate to = ym.atEndOfMonth();
 
@@ -51,27 +50,26 @@ public class ReportService {
                 .filter(i -> i.getDate() != null && !i.getDate().isBefore(from) && !i.getDate().isAfter(to))
                 .toList();
 
-        // Budget-Limits pro Kategorie
+        // ✅ Budget-Limits pro (normalisierte) Kategorie
         Map<String, Double> budgetByCat = budgets.stream()
                 .collect(Collectors.groupingBy(
-                        Budget::getCategory,
+                        b -> normalizeCategory(b.getCategory()),
                         Collectors.summingDouble(Budget::getLimitAmount)
                 ));
 
-        // Ausgaben pro Kategorie
+        // ✅ Ausgaben pro (normalisierte) Kategorie
         Map<String, Double> spentByCat = expenses.stream()
                 .collect(Collectors.groupingBy(
-                        Expense::getCategory,
+                        e -> normalizeCategory(e.getCategory()),
                         Collectors.summingDouble(Expense::getAmount)
                 ));
 
-        // Alle Kategorien (Union)
-        Set<String> categories = new HashSet<>();
+        // ✅ Alle Kategorien (Union)
+        Set<String> categories = new TreeSet<>();
         categories.addAll(budgetByCat.keySet());
         categories.addAll(spentByCat.keySet());
 
         List<ReportRow> rows = categories.stream()
-                .sorted()
                 .map(cat -> new ReportRow(
                         cat,
                         budgetByCat.getOrDefault(cat, 0.0),
@@ -84,5 +82,50 @@ public class ReportService {
 
         return new ReportResponse(month, incomeSum, expenseSum, rows);
     }
-}
 
+    /**
+     * Macht Kategorien robust:
+     * - akzeptiert FOOD/RENT/... (egal ob klein/groß)
+     * - akzeptiert deutsche Labels ("Essen", "Miete", ...)
+     * - akzeptiert Strings mit Emoji/Label ("🍔 Essen")
+     */
+    private String normalizeCategory(String raw) {
+        if (raw == null) return "OTHER";
+
+        String s = raw.trim();
+        if (s.isEmpty()) return "OTHER";
+
+        // Entfernt führende Emojis/Sonderzeichen (z.B. "🍔 Essen" -> "Essen")
+        s = s.replaceAll("^[^\\p{L}\\p{N}]+", "").trim();
+
+        // Wenn jemand "FOOD Essen" oder "Essen (FOOD)" gespeichert hat, vereinfache
+        // (nimmt den ersten "Wortblock")
+        // Optional: wenn mehrere Wörter, lassen wir es erstmal so.
+
+        String upper = s.toUpperCase(Locale.ROOT);
+
+        // bereits Code?
+        switch (upper) {
+            case "FOOD":
+            case "RENT":
+            case "FUN":
+            case "TRAVEL":
+            case "TECH":
+            case "OTHER":
+                return upper;
+        }
+
+        // deutsche Labels / Varianten
+        String lower = s.toLowerCase(Locale.ROOT);
+
+        if (lower.contains("essen")) return "FOOD";
+        if (lower.contains("miete")) return "RENT";
+        if (lower.contains("freizeit")) return "FUN";
+        if (lower.contains("reise")) return "TRAVEL";
+        if (lower.contains("technik")) return "TECH";
+        if (lower.contains("sonstig")) return "OTHER";
+
+        // Fallback: wenn es nichts matcht, wenigstens "OTHER"
+        return "OTHER";
+    }
+}

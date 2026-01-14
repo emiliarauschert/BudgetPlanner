@@ -1,3 +1,4 @@
+
 package BudgetPlanner.BudgetPlanner.Modell;
 
 import jakarta.persistence.*;
@@ -15,23 +16,26 @@ public class Budget {
 
     private String category;     // z.B. FOOD, RENT, FUN
 
+    private String title;        // ✅ Titel fürs Budget
+
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     public Budget() {}
 
-    // Getter & Setter
+    // Getter
     public Long getId() { return id; }
     public String getMonth() { return month; }
     public double getLimitAmount() { return limitAmount; }
     public String getCategory() { return category; }
+    public String getTitle() { return title; }          // ✅ neu
     public User getUser() { return user; }
 
+    // Setter
     public void setMonth(String month) { this.month = month; }
     public void setLimitAmount(double limitAmount) { this.limitAmount = limitAmount; }
     public void setCategory(String category) { this.category = category; }
+    public void setTitle(String title) { this.title = title; }  // ✅ neu
     public void setUser(User user) { this.user = user; }
 }
-
-
