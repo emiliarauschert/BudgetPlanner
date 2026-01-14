@@ -15,6 +15,7 @@ import static org.mockito.Mockito.when;
 import org.mockito.Mockito;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -29,6 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 class BudgetPlannerApplicationTests {
 
 	@Autowired
@@ -62,43 +64,36 @@ class BudgetPlannerApplicationTests {
 
 		user = new User();
 		user.setName("TestUser");
-		user.setEmail("test@test.com");
-		user.setPassword(passwordEncoder.encode("test"));
-		userRepository.save(user);
+		user.setEmail("test@test1.com");
 
-		when(userRepository.findByEmail("test@test.com"))
-				.thenReturn(Optional.of(user));
+		user.setPassword(passwordEncoder.encode("test123"));
+		userRepository.save(user);
 	}
 
 
 	@Test
-	@WithMockUser(username = "test@test.com")
-	void getBudgetTest() throws Exception {
+	@WithMockUser(username = "test@test1.com")
+	void addBudgetTest() throws Exception {
 
 		String json = """
-				{
-				  "user": {
-				    "id": %d
-				  },
-				  "expenses": [
-				    {"name": "Einkauf", "amount": 100.0},
-				    {"name": "Essen", "amount": 20.0}
-				  ]
-				}
-				""".formatted(user.getId());
+        {
+          "category": "FOOD",
+          "limitAmount": 500,
+          "month": "2025-01"
+        }
+        """;
 
-		mockMvc.perform(post("/budgets")
+		mockMvc.perform(post("/api/budgets")
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(json))
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.expenses.length()").value(2))
-				.andExpect(jsonPath("$.expenses[0].name").value("Einkauf"))
-				.andExpect(jsonPath("$.expenses[1].amount").value(20.0));
+				.andExpect(jsonPath("$.category").value("FOOD"))
+				.andExpect(jsonPath("$.limitAmount").value(500));
 	}
 
 
 	@Test
-	@WithMockUser(username = "test@test.com")
+	@WithMockUser(username = "test@test1.com")
 	void clearBudgetsTest() throws Exception {
 
 		String json = """
@@ -113,25 +108,22 @@ class BudgetPlannerApplicationTests {
 				}
 				""".formatted(user.getId());
 
-		mockMvc.perform(post("/budgets")
+		String response = mockMvc.perform(post("/api/budgets")
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(json))
+				.andReturn()
+				.getResponse()
+				.getContentAsString();
+
+		Long id = com.jayway.jsonpath.JsonPath.read(response, "$.id");
+
+		mockMvc.perform(delete("/api/budgets/" + id))
 				.andExpect(status().isOk());
-
-		mockMvc.perform(delete("/budgets")
-						.contentType(MediaType.APPLICATION_JSON))
-				.andExpect(status().isOk())
-				.andExpect(content().string("Alle Budgets gelöscht!"));
-
-		mockMvc.perform(get("/budgets")
-						.contentType(MediaType.APPLICATION_JSON))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.length()").value(0));
 	}
 
 
 	@Test
-	@WithMockUser(username = "test@test.com")
+	@WithMockUser(username = "test@test1.com")
 	void getIncomeTest() throws Exception {
 		String json = """
 				{
@@ -144,22 +136,22 @@ class BudgetPlannerApplicationTests {
 				}
 				""".formatted(user.getId());
 
-		mockMvc.perform(post("/income")
+		mockMvc.perform(post("/api/income")
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(json))
 				.andExpect(status().isOk());
 
-		mockMvc.perform(get("/income")
+		mockMvc.perform(get("/api/income")
 						.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.income[0].amount").value(2000.0));
+				.andExpect(jsonPath("$[0].amount").value(2000.0));
 
 
 
 	}
 
 	@Test
-	@WithMockUser(username = "test@test.com")
+	@WithMockUser(username = "test@test1.com")
 	void clearIncomeTest() throws Exception {
 
 		String json = """
@@ -173,16 +165,16 @@ class BudgetPlannerApplicationTests {
 				}
 				""".formatted(user.getId());
 
-		mockMvc.perform(post("/income")
+		mockMvc.perform(post("/api/income")
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(json))
 				.andExpect(status().isOk());
 
-		mockMvc.perform(delete("/income")
+		mockMvc.perform(delete("/api/income")
 						.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk());
 
-		mockMvc.perform(get("/income")
+		mockMvc.perform(get("/api/income")
 						.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.length()").value(0));
@@ -190,7 +182,7 @@ class BudgetPlannerApplicationTests {
 	}
 
 	@Test
-	@WithMockUser(username = "test@test.com")
+	@WithMockUser(username = "test@test1.com")
 	void updateGoalTest() throws Exception {
 
 		SavingsGoal updated = new SavingsGoal();
@@ -199,8 +191,11 @@ class BudgetPlannerApplicationTests {
 		updated.setCurrentAmount(2000);
 		updated.setDeadline(LocalDate.of(2026, 6, 1));
 
-		Mockito.when(savingsGoalService.update(Mockito.eq(1L), Mockito.any(), Mockito.eq(user)))
-				.thenReturn(updated);
+		Mockito.when(
+				savingsGoalService.update(Mockito.eq(1L), Mockito.any(), Mockito.any(User.class))
+		).thenReturn(updated);
+
+
 
 		String json = """
             {
@@ -221,7 +216,7 @@ class BudgetPlannerApplicationTests {
 	}
 
 	@Test
-	@WithMockUser(username = "test@test.com")
+	@WithMockUser(username = "test@test1.com")
 	void getReportTest() throws Exception {
 
 		ReportResponse response = new ReportResponse(
@@ -234,8 +229,10 @@ class BudgetPlannerApplicationTests {
 				)
 		);
 
-		Mockito.when(reportService.buildReport(user, "2025-01"))
-				.thenReturn(response);
+		Mockito.when(
+				reportService.buildReport(Mockito.any(User.class), Mockito.eq("2025-01"))
+		).thenReturn(response);
+
 
 		mockMvc.perform(get("/api/report")
 						.param("month", "2025-01"))

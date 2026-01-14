@@ -3,6 +3,7 @@ package BudgetPlanner.BudgetPlanner;
 import BudgetPlanner.BudgetPlanner.Modell.User;
 import BudgetPlanner.BudgetPlanner.Repository.*;
 import BudgetPlanner.BudgetPlanner.Security.*;
+import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,10 +13,12 @@ import static org.mockito.Mockito.when;
 import org.mockito.Mockito;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.security.test.context.support.WithMockUser;
 import java.util.Optional;
+
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -23,6 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 class AuthTests {
 
     @Autowired
@@ -43,37 +47,45 @@ class AuthTests {
     @BeforeEach
     void setUp() {
         userRepository.deleteAll();
+
+        user = new User();
+        user.setName("TestUser1");
+        user.setEmail("test@test1.com");
+        user.setPassword(passwordEncoder.encode("test123"));
+        userRepository.save(user);
     }
 
 
     @Test
-    @WithMockUser(username = "test@test.com")
+    @WithMockUser(username = "test@test1.com")
     void registerTest() throws Exception {
         String json = """
                 {
                   "name": "test",
-                  "email": "test@tester.com",
-                  "password": "test"
+                  "email": "test@test.com",
+                  "password": "test123"
                 }
                 """;
         mockMvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message")
+                        .value("Registrierung erfolgreich"));
 
     }
 
     @Test
-    @WithMockUser(username = "test@test.com")
+    @WithMockUser(username = "test@test1.com")
     void loginTest() throws Exception {
 
-        Mockito.when(jwtService.generateToken("test@test.com"))
+        Mockito.when(jwtService.generateToken("test@test1.com"))
                 .thenReturn("fake-jwt-token");
 
         String json = """
                 {
-                  "email": "test@test.com",
-                  "password": "test"
+                  "email": "test@test1.com",
+                  "password": "test123"
                 }
                 """;
 
@@ -82,12 +94,12 @@ class AuthTests {
                         .content(json))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.token").value("fake-jwt-token"))
-                .andExpect(jsonPath("$.name").value("TestUser"))
-                .andExpect(jsonPath("$.email").value("test@test.com"));
+                .andExpect(jsonPath("$.name").value("TestUser1"))
+                .andExpect(jsonPath("$.email").value("test@test1.com"));
     }
 
     @Test
-    @WithMockUser(username = "test@test.com")
+    @WithMockUser(username = "test@test1.com")
     void loginTest_wrongPassword() throws Exception {
 
         String json = """
