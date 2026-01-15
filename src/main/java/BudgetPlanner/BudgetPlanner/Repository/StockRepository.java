@@ -11,12 +11,9 @@ public interface StockRepository extends JpaRepository<Stock, Long> {
 
     List<Stock> findByUser(User user);
 
-    // Einzelnen Stock nur beim User löschen
     @Transactional
     void deleteByIdAndUser(Long id, User user);
 
-    // Portfolio für User leeren
     @Transactional
     void deleteByUser(User user);
 }
-

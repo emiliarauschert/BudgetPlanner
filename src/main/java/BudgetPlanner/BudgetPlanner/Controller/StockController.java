@@ -3,7 +3,7 @@ package BudgetPlanner.BudgetPlanner.Controller;
 import BudgetPlanner.BudgetPlanner.Modell.Stock;
 import BudgetPlanner.BudgetPlanner.Modell.User;
 import BudgetPlanner.BudgetPlanner.Repository.UserRepository;
-import BudgetPlanner.BudgetPlanner.Service.AlphaVantageService;
+import BudgetPlanner.BudgetPlanner.Service.FinnhubService;
 import BudgetPlanner.BudgetPlanner.Service.StockService;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.http.HttpStatus;
@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -23,16 +24,16 @@ import java.util.List;
 public class StockController {
 
     private final StockService stockService;
-    private final AlphaVantageService alphaVantageService;
+    private final FinnhubService finnhubService;
     private final UserRepository userRepository;
 
     public StockController(
             StockService stockService,
-            AlphaVantageService alphaVantageService,
+            FinnhubService finnhubService,
             UserRepository userRepository
     ) {
         this.stockService = stockService;
-        this.alphaVantageService = alphaVantageService;
+        this.finnhubService = finnhubService;
         this.userRepository = userRepository;
     }
 
@@ -48,6 +49,16 @@ public class StockController {
         String email = authentication.getName();
         User user = userRepository.findByEmail(email).orElseThrow();
         stock.setUser(user);
+
+        if (stock.getBuyDate() == null) stock.setBuyDate(LocalDate.now());
+
+        if (stock.getSymbol() == null || stock.getSymbol().isBlank()) {
+            throw new IllegalArgumentException("symbol fehlt");
+        }
+        if (stock.getTvSymbol() == null || stock.getTvSymbol().isBlank()) {
+            throw new IllegalArgumentException("tvSymbol fehlt");
+        }
+
         return stockService.saveStock(stock);
     }
 
@@ -65,37 +76,31 @@ public class StockController {
         stockService.clearPortfolioForUser(user);
     }
 
+    // ---- Quotes (Mini API via Finnhub) ----
     @GetMapping("/quote/{symbol}")
     public ResponseEntity<JsonNode> getQuote(@PathVariable String symbol) {
-        JsonNode node = alphaVantageService.getQuote(symbol);
+        JsonNode node = finnhubService.getQuote(symbol);
 
-        if (isError(node)) {
-            return ResponseEntity.status(statusFromMessage(node)).body(node);
-        }
+        if (isError(node)) return ResponseEntity.status(statusFromMessage(node)).body(node);
         return ResponseEntity.ok(node);
     }
 
-    @GetMapping("/chart/{symbol}")
-    public ResponseEntity<JsonNode> getChart(@PathVariable String symbol) {
-        JsonNode node = alphaVantageService.getChart(symbol);
+    // Batch Quotes fürs Portfolio
+    @GetMapping("/quotes")
+    public ResponseEntity<JsonNode> getQuotes(@RequestParam(name = "symbols") String symbolsCsv) {
+        String[] symbols = (symbolsCsv == null) ? new String[0] : symbolsCsv.split(",");
+        JsonNode node = finnhubService.getQuotes(symbols);
 
-        if (isError(node)) {
-            return ResponseEntity.status(statusFromMessage(node)).body(node);
-        }
+        if (isError(node)) return ResponseEntity.status(statusFromMessage(node)).body(node);
         return ResponseEntity.ok(node);
     }
 
-    /**
-     * OPTIONAL (aber sehr empfohlen):
-     * /api/stocks/search/BMW -> liefert mögliche Symbole inkl. Region/Währung
-     */
+    // ---- Suche (Finnhub Symbol Search) ----
     @GetMapping("/search/{keywords}")
     public ResponseEntity<JsonNode> search(@PathVariable String keywords) {
-        JsonNode node = alphaVantageService.searchSymbols(keywords);
+        JsonNode node = finnhubService.searchSymbols(keywords);
 
-        if (isError(node)) {
-            return ResponseEntity.status(statusFromMessage(node)).body(node);
-        }
+        if (isError(node)) return ResponseEntity.status(statusFromMessage(node)).body(node);
         return ResponseEntity.ok(node);
     }
 
@@ -105,9 +110,9 @@ public class StockController {
 
     private HttpStatus statusFromMessage(JsonNode node) {
         String msg = node.path("message").asText("").toLowerCase();
-        if (msg.contains("limit")) return HttpStatus.TOO_MANY_REQUESTS; // 429
-        if (msg.contains("invalid")) return HttpStatus.BAD_REQUEST;     // 400
-        if (msg.contains("no ")) return HttpStatus.NOT_FOUND;           // 404
-        return HttpStatus.BAD_GATEWAY;                                  // 502
+        if (msg.contains("limit") || msg.contains("rate")) return HttpStatus.TOO_MANY_REQUESTS;
+        if (msg.contains("invalid")) return HttpStatus.BAD_REQUEST;
+        if (msg.contains("no ")) return HttpStatus.NOT_FOUND;
+        return HttpStatus.BAD_GATEWAY;
     }
 }
