@@ -3,13 +3,11 @@ package BudgetPlanner.BudgetPlanner;
 import BudgetPlanner.BudgetPlanner.Modell.User;
 import BudgetPlanner.BudgetPlanner.Repository.*;
 import BudgetPlanner.BudgetPlanner.Security.*;
-import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import static org.mockito.Mockito.when;
 import org.mockito.Mockito;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,7 +15,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.security.test.context.support.WithMockUser;
-import java.util.Optional;
+
 
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -27,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-class AuthTests {
+class UserControllerTests {
 
     @Autowired
     private MockMvc mockMvc;
@@ -46,6 +44,7 @@ class AuthTests {
 
     @BeforeEach
     void setUp() {
+
         userRepository.deleteAll();
 
         user = new User();
@@ -57,7 +56,6 @@ class AuthTests {
 
 
     @Test
-    @WithMockUser(username = "test@test1.com")
     void registerTest() throws Exception {
         String json = """
                 {
@@ -72,6 +70,25 @@ class AuthTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message")
                         .value("Registrierung erfolgreich"));
+
+    }
+
+    @Test
+    @WithMockUser(username = "test@test1.com")
+    void register_twice() throws Exception {
+        String json = """
+                {
+                  "name": "TestUser1",
+                  "email": "test@test1.com",
+                  "password": "test123"
+                }
+                """;
+        mockMvc.perform(post("/api/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isConflict())
+                .andExpect(status().reason("E-Mail ist bereits registriert"));
+
 
     }
 
@@ -115,4 +132,6 @@ class AuthTests {
                 .andExpect(status().isUnauthorized());
 
     }
+
+
 }
