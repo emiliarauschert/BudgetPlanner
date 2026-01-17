@@ -24,16 +24,13 @@ public class UserController {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
-    public UserController(
-            UserRepository userRepository,
-            PasswordEncoder passwordEncoder,
-            JwtService jwtService
-    ) {
+    public UserController(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
     }
 
+    //Login (Post)
     @PostMapping("/login")
     public Map<String, String> login(@Valid @RequestBody LoginRequest request) {
 
@@ -53,10 +50,11 @@ public class UserController {
         );
     }
 
+    //Registrieren (Post)
     @PostMapping("/register")
     public Map<String, String> register(@Valid @RequestBody SignUpRequest request) {
 
-        // @Valid checkt name/email/password (inkl. Email-Format + Passwortlänge falls im DTO)
+        // @Valid checkt name/email/password (inkl. Email-Format + Passwortlänge im DTO)
         boolean exists = userRepository.findByEmail(request.email()).isPresent();
         if (exists) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "E-Mail ist bereits registriert");
@@ -72,6 +70,7 @@ public class UserController {
         return Map.of("message", "Registrierung erfolgreich");
     }
 
+    // Get (mein Account)
     @GetMapping("/me")
     public Map<String, String> me(Authentication authentication) {
         if (authentication == null || authentication.getName() == null) {
@@ -88,6 +87,7 @@ public class UserController {
         );
     }
 
+    // Update (Email)
     @PutMapping("/me/email")
     public Map<String, String> updateEmail(
             @Valid @RequestBody UpdateEmailRequest request,

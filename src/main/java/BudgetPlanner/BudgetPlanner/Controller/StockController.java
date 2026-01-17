@@ -27,16 +27,13 @@ public class StockController {
     private final FinnhubService finnhubService;
     private final UserRepository userRepository;
 
-    public StockController(
-            StockService stockService,
-            FinnhubService finnhubService,
-            UserRepository userRepository
-    ) {
+    public StockController (StockService stockService, FinnhubService finnhubService, UserRepository userRepository) {
         this.stockService = stockService;
         this.finnhubService = finnhubService;
         this.userRepository = userRepository;
     }
 
+    //Get
     @GetMapping
     public List<Stock> getUserStocks(Authentication authentication) {
         String email = authentication.getName();
@@ -44,6 +41,7 @@ public class StockController {
         return stockService.getStocksForUser(user);
     }
 
+    // Post
     @PostMapping
     public Stock addStock(@RequestBody Stock stock, Authentication authentication) {
         String email = authentication.getName();
@@ -62,6 +60,7 @@ public class StockController {
         return stockService.saveStock(stock);
     }
 
+    // Delete
     @DeleteMapping("/{id}")
     public void deleteStock(@PathVariable Long id, Authentication authentication) {
         String email = authentication.getName();
@@ -69,6 +68,7 @@ public class StockController {
         stockService.deleteStockForUser(id, user);
     }
 
+    // Delete
     @DeleteMapping
     public void clearPortfolio(Authentication authentication) {
         String email = authentication.getName();
@@ -76,7 +76,7 @@ public class StockController {
         stockService.clearPortfolioForUser(user);
     }
 
-    // ---- Quotes (Mini API via Finnhub) ----
+    // Get (Finnhub)
     @GetMapping("/quote/{symbol}")
     public ResponseEntity<JsonNode> getQuote(@PathVariable String symbol) {
         JsonNode node = finnhubService.getQuote(symbol);
@@ -85,7 +85,7 @@ public class StockController {
         return ResponseEntity.ok(node);
     }
 
-    // Batch Quotes fürs Portfolio
+    // Get (Finnub)
     @GetMapping("/quotes")
     public ResponseEntity<JsonNode> getQuotes(@RequestParam(name = "symbols") String symbolsCsv) {
         String[] symbols = (symbolsCsv == null) ? new String[0] : symbolsCsv.split(",");
@@ -95,7 +95,7 @@ public class StockController {
         return ResponseEntity.ok(node);
     }
 
-    // ---- Suche (Finnhub Symbol Search) ----
+    // Get (Symbole über Finnhub)
     @GetMapping("/search/{keywords}")
     public ResponseEntity<JsonNode> search(@PathVariable String keywords) {
         JsonNode node = finnhubService.searchSymbols(keywords);
@@ -108,6 +108,7 @@ public class StockController {
         return node != null && node.has("s") && "error".equalsIgnoreCase(node.path("s").asText());
     }
 
+    // Fehlerbehandlung wegen Free API Einschränkungen
     private HttpStatus statusFromMessage(JsonNode node) {
         String msg = node.path("message").asText("").toLowerCase();
         if (msg.contains("limit") || msg.contains("rate")) return HttpStatus.TOO_MANY_REQUESTS;

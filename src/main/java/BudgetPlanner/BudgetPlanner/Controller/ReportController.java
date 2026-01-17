@@ -20,6 +20,7 @@ public class ReportController {
         this.userRepository = userRepository;
     }
 
+    // Get
     @GetMapping
     public ReportResponse getReport(@RequestParam String month, Authentication auth) {
         User user = userRepository.findByEmail(auth.getName()).orElseThrow();

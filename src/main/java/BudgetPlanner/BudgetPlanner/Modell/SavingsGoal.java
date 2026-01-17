@@ -12,11 +12,8 @@ public class SavingsGoal {
     private Long id;
 
     private String title;
-
     private double targetAmount;
-
     private double currentAmount;
-
     private LocalDate deadline;
 
     @ManyToOne

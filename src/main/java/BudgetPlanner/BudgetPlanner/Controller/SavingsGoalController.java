@@ -22,26 +22,31 @@ public class SavingsGoalController {
         this.userRepository = userRepository;
     }
 
+    // Get (User)
     private User currentUser(Authentication authentication) {
         String email = authentication.getName();
         return userRepository.findByEmail(email).orElseThrow();
     }
 
+    //Get
     @GetMapping
     public List<SavingsGoal> getGoals(Authentication authentication) {
         return service.getForUser(currentUser(authentication));
     }
 
+    // Post
     @PostMapping
     public SavingsGoal create(@RequestBody SavingsGoal goal, Authentication authentication) {
         return service.create(goal, currentUser(authentication));
     }
 
+    //Update
     @PutMapping("/{id}")
     public SavingsGoal update(@PathVariable Long id, @RequestBody SavingsGoal goal, Authentication authentication) {
         return service.update(id, goal, currentUser(authentication));
     }
 
+    //Delete
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id, Authentication authentication) {
         service.delete(id, currentUser(authentication));

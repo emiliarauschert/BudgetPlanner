@@ -23,15 +23,18 @@ public class ExpenseController {
         this.userRepository = userRepository;
     }
 
+    // Get (User)
     private User currentUser(Authentication auth) {
         return userRepository.findByEmail(auth.getName()).orElseThrow();
     }
 
+    // Get
     @GetMapping
     public List<Expense> getExpenses(Authentication auth) {
         return expenseService.getForUser(currentUser(auth));
     }
 
+    // Post
     @PostMapping
     public Expense addExpense(@RequestBody Expense expense, Authentication auth) {
         expense.setUser(currentUser(auth));
@@ -39,6 +42,7 @@ public class ExpenseController {
         return expenseService.save(expense);
     }
 
+    // Delete
     @DeleteMapping("/{id}")
     public void deleteExpense(@PathVariable Long id) {
         expenseService.delete(id);

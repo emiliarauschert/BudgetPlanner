@@ -11,20 +11,15 @@ public class Stock {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // z.B. AAPL oder BMW.DE (dein internes Symbol)
     @Column(nullable = false)
     private String symbol;
 
-    // TradingView Symbol (z.B. NASDAQ:AAPL oder XETR:BMW)
     @Column(nullable = false)
     private String tvSymbol;
 
     private String name;
-
     private double quantity;
-
     private double buyPrice;
-
     private LocalDate buyDate;
 
     @ManyToOne

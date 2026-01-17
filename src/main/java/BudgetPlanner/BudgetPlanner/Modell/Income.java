@@ -13,7 +13,6 @@ public class Income {
 
     private String title;
     private double amount;
-
     private String category;
     private LocalDate date;
 

@@ -11,11 +11,10 @@ public class Expense {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String title;        // z.B. "Einkauf"
-    private double amount;       // z.B. 25.50
-
-    private String category;     // z.B. FOOD, RENT, FUN ...
-    private LocalDate date;      // z.B. 2026-01-11
+    private String title;
+    private double amount;
+    private String category;
+    private LocalDate date;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)

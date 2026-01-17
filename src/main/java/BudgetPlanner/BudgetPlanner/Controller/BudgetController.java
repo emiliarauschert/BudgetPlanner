@@ -22,12 +22,14 @@ public class BudgetController {
         this.userRepository = userRepository;
     }
 
+    // Get
     @GetMapping
     public List<Budget> getBudgets(Authentication auth) {
         User user = userRepository.findByEmail(auth.getName()).orElseThrow();
         return budgetService.getForUser(user);
     }
 
+    // Post
     @PostMapping
     public Budget addBudget(@RequestBody Budget budget, Authentication auth) {
         User user = userRepository.findByEmail(auth.getName()).orElseThrow();
@@ -35,6 +37,7 @@ public class BudgetController {
         return budgetService.save(budget);
     }
 
+    // Delete
     @DeleteMapping("/{id}")
     public void deleteBudget(@PathVariable Long id) {
         budgetService.delete(id);
