@@ -1,4 +1,3 @@
-
 package budgetplaner.budgetplaner.Modell;
 
 import jakarta.persistence.*;
@@ -22,7 +21,7 @@ public class Budget {
 
     public Budget() {}
 
-    // Getter
+    // Getter für später
     public Long getId() { return id; }
     public String getMonth() { return month; }
     public double getLimitAmount() { return limitAmount; }
@@ -30,10 +29,11 @@ public class Budget {
     public String getTitle() { return title; }
     public User getUser() { return user; }
 
-    // Setter
+    // Setter für später
     public void setMonth(String month) { this.month = month; }
     public void setLimitAmount(double limitAmount) { this.limitAmount = limitAmount; }
     public void setCategory(String category) { this.category = category; }
     public void setTitle(String title) { this.title = title; }
     public void setUser(User user) { this.user = user; }
 }
+

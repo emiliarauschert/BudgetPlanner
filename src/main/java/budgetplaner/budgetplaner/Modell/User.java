@@ -21,6 +21,7 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Stock> stocks;
 
+    //Getter und Setter für später
     public Long getId() {
         return id;
     }

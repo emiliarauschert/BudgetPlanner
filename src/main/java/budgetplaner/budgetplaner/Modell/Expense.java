@@ -22,6 +22,7 @@ public class Expense {
 
     public Expense() {}
 
+    //Setter und Getter für später
     public Long getId() { return id; }
 
     public String getTitle() { return title; }

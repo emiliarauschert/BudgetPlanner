@@ -26,7 +26,7 @@ public class Stock {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    // --- Getter/Setter ---
+    //Getter und Setter für später
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -51,3 +51,4 @@ public class Stock {
     public User getUser() { return user; }
     public void setUser(User user) { this.user = user; }
 }
+

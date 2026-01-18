@@ -20,6 +20,7 @@ public class SavingsGoal {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    //Getter und Setter für später
     public Long getId() { return id; }
 
     public String getTitle() { return title; }
@@ -37,4 +38,3 @@ public class SavingsGoal {
     public User getUser() { return user; }
     public void setUser(User user) { this.user = user; }
 }
-

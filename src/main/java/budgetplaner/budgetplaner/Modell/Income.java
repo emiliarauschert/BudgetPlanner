@@ -22,6 +22,7 @@ public class Income {
 
     public Income() {}
 
+    //Getter und Setter für später
     public Long getId() { return id; }
 
     public String getTitle() { return title; }
@@ -39,3 +40,4 @@ public class Income {
     public User getUser() { return user; }
     public void setUser(User user) { this.user = user; }
 }
+
