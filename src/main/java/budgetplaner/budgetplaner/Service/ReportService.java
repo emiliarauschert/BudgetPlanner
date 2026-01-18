@@ -34,7 +34,7 @@ public class ReportService {
     }
 
     public ReportResponse buildReport(User user, String month) {
-        YearMonth ym = YearMonth.parse(month); // erwartet YYYY-MM
+        YearMonth ym = YearMonth.parse(month);
         LocalDate from = ym.atDay(1);
         LocalDate to = ym.atEndOfMonth();
 
@@ -50,21 +50,21 @@ public class ReportService {
                 .filter(i -> i.getDate() != null && !i.getDate().isBefore(from) && !i.getDate().isAfter(to))
                 .toList();
 
-        // ✅ Budget-Limits pro (normalisierte) Kategorie
+        // Budget-Limits pro Kategorie
         Map<String, Double> budgetByCat = budgets.stream()
                 .collect(Collectors.groupingBy(
                         b -> normalizeCategory(b.getCategory()),
                         Collectors.summingDouble(Budget::getLimitAmount)
                 ));
 
-        // ✅ Ausgaben pro (normalisierte) Kategorie
+        // Ausgaben pro Kategorie
         Map<String, Double> spentByCat = expenses.stream()
                 .collect(Collectors.groupingBy(
                         e -> normalizeCategory(e.getCategory()),
                         Collectors.summingDouble(Expense::getAmount)
                 ));
 
-        // ✅ Alle Kategorien (Union)
+        // Alle Kategorien
         Set<String> categories = new TreeSet<>();
         categories.addAll(budgetByCat.keySet());
         categories.addAll(spentByCat.keySet());
@@ -83,28 +83,18 @@ public class ReportService {
         return new ReportResponse(month, incomeSum, expenseSum, rows);
     }
 
-    /**
-     * Macht Kategorien robust:
-     * - akzeptiert FOOD/RENT/... (egal ob klein/groß)
-     * - akzeptiert deutsche Labels ("Essen", "Miete", ...)
-     * - akzeptiert Strings mit Emoji/Label ("🍔 Essen")
-     */
+   //Kategorien robust
     private String normalizeCategory(String raw) {
         if (raw == null) return "OTHER";
 
         String s = raw.trim();
         if (s.isEmpty()) return "OTHER";
 
-        // Entfernt führende Emojis/Sonderzeichen (z.B. "🍔 Essen" -> "Essen")
+        // Entfernt führende Sonderzeichen
         s = s.replaceAll("^[^\\p{L}\\p{N}]+", "").trim();
-
-        // Wenn jemand "FOOD Essen" oder "Essen (FOOD)" gespeichert hat, vereinfache
-        // (nimmt den ersten "Wortblock")
-        // Optional: wenn mehrere Wörter, lassen wir es erstmal so.
 
         String upper = s.toUpperCase(Locale.ROOT);
 
-        // bereits Code?
         switch (upper) {
             case "FOOD":
             case "RENT":
@@ -125,7 +115,7 @@ public class ReportService {
         if (lower.contains("technik")) return "TECH";
         if (lower.contains("sonstig")) return "OTHER";
 
-        // Fallback: wenn es nichts matcht, wenigstens "OTHER"
+        // Fallback: wenn es nichts matcht, dann "OTHER"
         return "OTHER";
     }
 }

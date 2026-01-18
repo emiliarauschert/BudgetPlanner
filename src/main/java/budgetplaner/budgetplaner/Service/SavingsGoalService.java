@@ -29,7 +29,7 @@ public class SavingsGoalService {
     public SavingsGoal update(Long id, SavingsGoal updated, User user) {
         SavingsGoal existing = repo.findById(id).orElseThrow();
 
-        // Safety: nur Owner darf updaten
+        // nur Owner darf updaten
         if (!existing.getUser().getId().equals(user.getId())) {
             throw new RuntimeException("Forbidden");
         }
@@ -50,4 +50,3 @@ public class SavingsGoalService {
         repo.delete(existing);
     }
 }
-

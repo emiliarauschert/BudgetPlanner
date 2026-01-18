@@ -28,4 +28,3 @@ public class IncomeService {
         repo.deleteById(id);
     }
 }
-

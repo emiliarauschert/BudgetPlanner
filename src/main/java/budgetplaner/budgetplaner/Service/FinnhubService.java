@@ -9,9 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 @Service
 public class FinnhubService {
 
@@ -21,11 +18,7 @@ public class FinnhubService {
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper mapper = new ObjectMapper();
 
-    /**
-     * Finnhub Quote -> in deinem Format:
-     * Erfolg: { s:"ok", c,h,l,o,pc }
-     * Fehler: { s:"error", message:"..." }
-     */
+    //Quote in meinem Format
     public JsonNode getQuote(String symbol) {
         String url = UriComponentsBuilder
                 .fromHttpUrl("https://finnhub.io/api/v1/quote")
@@ -35,7 +28,6 @@ public class FinnhubService {
         try {
             JsonNode root = getJsonWithToken(url);
 
-            // Finnhub liefert bei ungültig/leer oft 0-Werte. Wir prüfen "c".
             double c = root.path("c").asDouble(0);
             double h = root.path("h").asDouble(0);
             double l = root.path("l").asDouble(0);
@@ -60,10 +52,7 @@ public class FinnhubService {
         }
     }
 
-    /**
-     * Batch Quotes: /quotes?symbols=AAPL,MSFT
-     * Erfolg: { s:"ok", data:{ "AAPL":{...}, "MSFT":{...} } }
-     */
+    //Quotes
     public JsonNode getQuotes(String[] symbols) {
         try {
             ObjectNode data = mapper.createObjectNode();
@@ -88,11 +77,7 @@ public class FinnhubService {
         }
     }
 
-    /**
-     * Finnhub Symbol Search:
-     * GET https://finnhub.io/api/v1/search?q=apple
-     * Erfolg: { s:"ok", matches:[{symbol,description,type}...] }
-     */
+    //Symbol suchen
     public JsonNode searchSymbols(String keywords) {
         String url = UriComponentsBuilder
                 .fromHttpUrl("https://finnhub.io/api/v1/search")
@@ -107,7 +92,7 @@ public class FinnhubService {
                 return errorNode("No matches");
             }
 
-            // Ausgabe in deinem Frontend-Format (matches)
+            // Ausgabe in Frontend-Format
             ObjectNode out = mapper.createObjectNode();
             out.put("s", "ok");
 
@@ -127,8 +112,7 @@ public class FinnhubService {
         }
     }
 
-    // ---- helpers ----
-
+    // Hilfsmethoden
     private JsonNode getJsonWithToken(String url) throws Exception {
         HttpHeaders headers = new HttpHeaders();
         headers.set("X-Finnhub-Token", apiKey);
@@ -154,3 +138,4 @@ public class FinnhubService {
         return (m == null || m.isBlank()) ? e.getClass().getSimpleName() : m;
     }
 }
+
