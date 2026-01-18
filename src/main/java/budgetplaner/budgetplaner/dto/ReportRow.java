@@ -7,8 +7,6 @@ public class ReportRow {
     private double remaining;
     private double percentUsed;
 
-    public ReportRow() {}
-
     public ReportRow(String category, double budgetLimit, double spent) {
         this.category = category;
         this.budgetLimit = budgetLimit;
@@ -17,6 +15,7 @@ public class ReportRow {
         this.percentUsed = budgetLimit <= 0 ? 0 : Math.round((spent / budgetLimit) * 100.0);
     }
 
+    //Getter und Setter zur Sicherheit schon eingebaut, falls sie in Zukunft noch gebraucht werden
     public String getCategory() { return category; }
     public double getBudgetLimit() { return budgetLimit; }
     public double getSpent() { return spent; }
@@ -29,4 +28,3 @@ public class ReportRow {
     public void setRemaining(double remaining) { this.remaining = remaining; }
     public void setPercentUsed(double percentUsed) { this.percentUsed = percentUsed; }
 }
-

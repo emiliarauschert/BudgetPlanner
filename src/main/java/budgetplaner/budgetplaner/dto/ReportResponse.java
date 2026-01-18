@@ -9,8 +9,6 @@ public class ReportResponse {
     private double net;
     private List<ReportRow> rows;
 
-    public ReportResponse() {}
-
     public ReportResponse(String month, double incomeSum, double expenseSum, List<ReportRow> rows) {
         this.month = month;
         this.incomeSum = incomeSum;
@@ -19,6 +17,7 @@ public class ReportResponse {
         this.rows = rows;
     }
 
+    //Getter und Setter zur Sicherheit schon eingebaut, falls die Funktion noch gebraucht wird
     public String getMonth() { return month; }
     public double getIncomeSum() { return incomeSum; }
     public double getExpenseSum() { return expenseSum; }
