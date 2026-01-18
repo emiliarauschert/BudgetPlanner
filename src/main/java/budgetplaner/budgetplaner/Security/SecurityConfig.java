@@ -33,7 +33,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/auth/register").permitAll()
 
-                        // ✅ /me und /me/email sollen AUTH brauchen
+                        // /me und /me/email benutzen AUTH
                         .requestMatchers(HttpMethod.GET, "/api/auth/me").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/auth/me/email").authenticated()
 
@@ -63,3 +63,4 @@ public class SecurityConfig {
         return source;
     }
 }
+
