@@ -27,4 +27,3 @@ public class ReportController {
         return reportService.buildReport(user, month);
     }
 }
-
